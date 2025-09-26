@@ -11,7 +11,10 @@ import {
   Calendar,
   MessageSquare
 } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { getTeacherCell, isUsingMocks } from '@/lib/data-service-enhanced';
 import { getStatusColor, getStatusLabel, formatShortDate } from '@/lib/utils';
+import { useRole } from '@/context/role-context';
 
 // Mock data for teacher's assigned cell
 const mockTeacherCell = {
@@ -77,7 +80,63 @@ const mockTeacherCell = {
 };
 
 export default function MyCellPage() {
-  const { students } = mockTeacherCell;
+  const { role } = useRole();
+  const [cellData, setCellData] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function loadCellData() {
+      try {
+        // In a real app, you'd get the current teacher's ID from session
+        const teacherId = 'teacher-1'; // This would come from authentication
+        const data = getTeacherCell(teacherId);
+        setCellData(data);
+      } catch (error) {
+        console.error('Error loading cell data:', error);
+        setCellData(null);
+      } finally {
+        setLoading(false);
+      }
+    }
+    loadCellData();
+  }, []);
+
+  if (loading) {
+    return (
+      <Layout>
+        <div className="flex items-center justify-center h-64">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600"></div>
+        </div>
+      </Layout>
+    );
+  }
+
+  if (!cellData) {
+    return (
+      <Layout>
+        <div className="space-y-6">
+          <div className="border-b border-gray-200 pb-4">
+            <h1 className="text-2xl font-bold text-gray-900">Mi Célula</h1>
+            <p className="mt-2 text-gray-600">
+              Gestión de estudiantes asignados
+            </p>
+          </div>
+          
+          <div className="text-center py-12">
+            <Users className="mx-auto h-12 w-12 text-gray-400" />
+            <h3 className="mt-2 text-sm font-medium text-gray-900">No hay célula asignada</h3>
+            <p className="mt-1 text-sm text-gray-500">
+              {isUsingMocks() 
+                ? 'Los datos de demostración no están disponibles.' 
+                : 'No tienes estudiantes asignados o no hay conexión con Google Classroom.'}
+            </p>
+          </div>
+        </div>
+      </Layout>
+    );
+  }
+
+  const { students } = cellData;
   
   // Calculate cell metrics
   const totalAssignments = students[0]?.assignments.length || 0;
@@ -100,9 +159,9 @@ export default function MyCellPage() {
       <div className="space-y-6">
         {/* Header */}
         <div className="border-b border-gray-200 pb-4">
-          <h1 className="text-2xl font-bold text-gray-900">{mockTeacherCell.name}</h1>
+          <h1 className="text-2xl font-bold text-gray-900">{cellData.name}</h1>
           <p className="mt-2 text-gray-600">
-            {mockTeacherCell.courseName} • {students.length} estudiantes asignados
+            {cellData.courseName} • {students.length} estudiantes asignados
           </p>
         </div>
 

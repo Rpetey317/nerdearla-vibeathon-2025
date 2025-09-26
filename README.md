@@ -29,34 +29,6 @@ Data is mocked for now. Later we can connect to the Google Classroom API and Goo
 ### Quick Start (Mock Data)
 1) Install Node.js (recommended via nvm)
 
-```bash
-# If you don't have nvm
-curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash
-# restart your shell, then
-nvm install --lts
-nvm use --lts
-```
-
-2) Install dependencies
-
-```bash
-npm install
-```
-
-3) Run the dev server
-
-```bash
-npm run dev
-```
-
-Then open http://localhost:3000
-
-### Full Setup (Google Classroom Integration)
-
-To connect with real Google Classroom data:
-
-1) Follow the detailed setup guide: **[GOOGLE_CLASSROOM_SETUP.md](./GOOGLE_CLASSROOM_SETUP.md)**
-
 2) Set up your environment variables:
 ```bash
 cp .env.local.example .env.local

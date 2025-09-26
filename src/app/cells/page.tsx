@@ -8,8 +8,11 @@ import {
   AlertTriangle,
   TrendingUp,
   TrendingDown,
-  BarChart3
+  BarChart3,
+  BookOpen
 } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { getCellMetrics, isUsingMocks } from '@/lib/data-service-enhanced';
 import { getStatusColor, getStatusLabel, getProgressColor } from '@/lib/utils';
 
 // Mock data for cells (this would come from API)
@@ -65,12 +68,66 @@ const mockCells = [
 ];
 
 export default function CellsPage() {
+  const [cells, setCells] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function loadCells() {
+      try {
+        const cellMetrics = getCellMetrics();
+        setCells(cellMetrics);
+      } catch (error) {
+        console.error('Error loading cells:', error);
+        setCells([]);
+      } finally {
+        setLoading(false);
+      }
+    }
+    loadCells();
+  }, []);
+
+  if (loading) {
+    return (
+      <Layout>
+        <div className="flex items-center justify-center h-64">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600"></div>
+        </div>
+      </Layout>
+    );
+  }
+
+  // Show empty state if no cells
+  if (cells.length === 0) {
+    return (
+      <Layout>
+        <div className="space-y-6">
+          <div className="border-b border-gray-200 pb-4">
+            <h1 className="text-2xl font-bold text-gray-900">Gestión de Células</h1>
+            <p className="mt-2 text-gray-600">
+              Vista general del rendimiento por células y profesores de práctica
+            </p>
+          </div>
+          
+          <div className="text-center py-12">
+            <BookOpen className="mx-auto h-12 w-12 text-gray-400" />
+            <h3 className="mt-2 text-sm font-medium text-gray-900">No hay células disponibles</h3>
+            <p className="mt-1 text-sm text-gray-500">
+              {isUsingMocks() 
+                ? 'Los datos de demostración no están disponibles.' 
+                : 'Conecta tu cuenta de Google Classroom para ver las células.'}
+            </p>
+          </div>
+        </div>
+      </Layout>
+    );
+  }
+
   // Calculate overall metrics
-  const totalStudents = mockCells.reduce((sum, cell) => sum + cell.totalStudents, 0);
-  const totalDeliveries = mockCells.reduce((sum, cell) => sum + cell.totalDeliveries, 0);
-  const totalLateDeliveries = mockCells.reduce((sum, cell) => sum + cell.lateDeliveries, 0);
-  const totalPendingAssignments = mockCells.reduce((sum, cell) => sum + cell.pendingAssignments, 0);
-  const averageCompletionRate = mockCells.reduce((sum, cell) => sum + cell.completionRate, 0) / mockCells.length;
+  const totalStudents = cells.reduce((sum, cell) => sum + cell.totalStudents, 0);
+  const totalDeliveries = cells.reduce((sum, cell) => sum + cell.totalDeliveries, 0);
+  const totalLateDeliveries = cells.reduce((sum, cell) => sum + cell.lateDeliveries, 0);
+  const totalPendingAssignments = cells.reduce((sum, cell) => sum + cell.pendingAssignments, 0);
+  const averageCompletionRate = cells.length > 0 ? cells.reduce((sum, cell) => sum + cell.completionRate, 0) / cells.length : 0;
 
   return (
     <Layout>
@@ -138,7 +195,7 @@ export default function CellsPage() {
 
         {/* Cells Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {mockCells.map((cell) => (
+          {cells.map((cell) => (
             <div key={cell.id} className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
               <div className="flex items-center justify-between mb-4">
                 <div>
@@ -207,7 +264,7 @@ export default function CellsPage() {
                 <span className="text-lg font-semibold text-green-600">Células Destacadas</span>
               </div>
               <p className="text-sm text-gray-600">
-                {mockCells.filter(c => c.completionRate >= 90).length} células con +90% completado
+                {cells.filter(c => c.completionRate >= 90).length} células con +90% completado
               </p>
             </div>
             
@@ -217,7 +274,7 @@ export default function CellsPage() {
                 <span className="text-lg font-semibold text-yellow-600">En Progreso</span>
               </div>
               <p className="text-sm text-gray-600">
-                {mockCells.filter(c => c.completionRate >= 75 && c.completionRate < 90).length} células entre 75-90%
+                {cells.filter(c => c.completionRate >= 75 && c.completionRate < 90).length} células entre 75-90%
               </p>
             </div>
             
@@ -227,7 +284,7 @@ export default function CellsPage() {
                 <span className="text-lg font-semibold text-red-600">Requieren Apoyo</span>
               </div>
               <p className="text-sm text-gray-600">
-                {mockCells.filter(c => c.completionRate < 75).length} células necesitan seguimiento
+                {cells.filter(c => c.completionRate < 75).length} células necesitan seguimiento
               </p>
             </div>
           </div>

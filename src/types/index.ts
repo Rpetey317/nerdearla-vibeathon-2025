@@ -52,7 +52,7 @@ export interface Notification {
   userId: string;
   title: string;
   message: string;
-  type: 'assignment' | 'grade' | 'announcement' | 'reminder';
+  type: 'assignment' | 'grade' | 'announcement' | 'reminder' | 'late_delivery' | 'cell_alert';
   read: boolean;
   createdAt: Date;
 }

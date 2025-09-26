@@ -12,7 +12,7 @@ import {
   Calendar
 } from 'lucide-react';
 import { useState, useEffect } from 'react';
-import { fetchAllCoursesWithData, calculateStudentProgress, generateNotifications } from '@/lib/data-service';
+import { fetchAllCoursesWithData, calculateStudentProgress, generateNotifications, isUsingMocks } from '@/lib/data-service-enhanced';
 import { Course, Assignment, Submission, User, StudentProgress, Notification } from '@/types';
 import { getProgressColor, formatShortDate } from '@/lib/utils';
 import { useRole } from '@/context/role-context';
