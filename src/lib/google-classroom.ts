@@ -90,8 +90,18 @@ export async function getCourseWork(courseId: string) {
     });
 
     return response.data.courseWork || [];
-  } catch (error) {
+  } catch (error: any) {
     console.error('Error fetching course work:', error);
+    
+    // Provide more specific error information
+    if (error.status === 403 || error.code === 403) {
+      throw new Error(`Permission denied: Unable to access course work for course ${courseId}. You may need teacher permissions for this course.`);
+    }
+    
+    if (error.status === 401 || error.code === 401) {
+      throw new Error('Authentication failed. Please sign in again.');
+    }
+    
     throw error;
   }
 }
@@ -106,8 +116,18 @@ export async function getStudentSubmissions(courseId: string, courseWorkId: stri
     });
 
     return response.data.studentSubmissions || [];
-  } catch (error) {
+  } catch (error: any) {
     console.error('Error fetching student submissions:', error);
+    
+    // Provide more specific error information
+    if (error.status === 403 || error.code === 403) {
+      throw new Error(`Permission denied: Unable to access student submissions for course ${courseId}. You may need teacher permissions for this course.`);
+    }
+    
+    if (error.status === 401 || error.code === 401) {
+      throw new Error('Authentication failed. Please sign in again.');
+    }
+    
     throw error;
   }
 }
