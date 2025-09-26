@@ -15,8 +15,10 @@ import { useState, useEffect } from 'react';
 import { fetchAllCoursesWithData, calculateStudentProgress, generateNotifications } from '@/lib/data-service';
 import { Course, Assignment, Submission, User, StudentProgress, Notification } from '@/types';
 import { getProgressColor, formatShortDate } from '@/lib/utils';
+import { useRole } from '@/context/role-context';
 
 export default function Dashboard() {
+  const { role } = useRole();
   const [data, setData] = useState<{
     courses: Course[];
     assignments: Assignment[];
@@ -97,7 +99,7 @@ export default function Dashboard() {
   const totalStudents = data.students.length;
   const totalCourses = data.courses.length;
   const totalSubmissions = data.submissions.length;
-  const pendingSubmissions = data.submissions.filter(s => s.status === 'pending').length;
+  const pendingSubmissions = data.submissions.filter(s => s.status === 'asignado' || s.status === 'pending').length;
   const unreadNotifications = data.notifications.filter(n => !n.read).length;
 
   // Get recent activity
@@ -117,9 +119,15 @@ export default function Dashboard() {
       <div className="space-y-6">
         {/* Header */}
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Dashboard Principal</h1>
+          <h1 className="text-2xl font-bold text-gray-900">
+            {role === 'coordinator' ? 'Dashboard de Coordinación' : 
+             role === 'teacher' ? 'Dashboard del Profesor' : 
+             'Mi Dashboard'}
+          </h1>
           <p className="mt-1 text-sm text-gray-500">
-            Resumen general del progreso de estudiantes y actividades
+            {role === 'coordinator' ? 'Vista general de todas las células y estudiantes' :
+             role === 'teacher' ? 'Seguimiento de tu célula asignada' :
+             'Tu progreso y actividades'}
           </p>
         </div>
 

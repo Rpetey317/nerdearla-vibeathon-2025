@@ -1,24 +1,23 @@
 # Google Classroom API Setup Guide
 
-This guide will help you set up Google Classroom API access for the Semillero Digital dashboard.
+This guide will help you set up Google Classroom API access for Rep's EduCompass dashboard.
 
 ## Prerequisites
 
 1. A Google account with access to Google Classroom
 2. Node.js and npm installed
-3. The project dependencies installed (`npm install`)
 
 ## Step 1: Create a Google Cloud Project
 
 1. Go to the [Google Cloud Console](https://console.cloud.google.com/)
 2. Click "Select a project" → "New Project"
-3. Enter project name: `semillero-digital-dashboard`
+3. Enter project name: `reps-educompass-dashboard`
 4. Click "Create"
 
 ## Step 2: Enable Google Classroom API
 
 1. In the Google Cloud Console, go to "APIs & Services" → "Library"
-2. Search for "Google Classroom API"
+{{ ... }}
 3. Click on it and press "Enable"
 4. Also enable "Google Calendar API" (for future attendance features)
 
@@ -27,7 +26,7 @@ This guide will help you set up Google Classroom API access for the Semillero Di
 1. Go to "APIs & Services" → "OAuth consent screen"
 2. Choose "External" (unless you have a Google Workspace)
 3. Fill in the required fields:
-   - **App name**: `Semillero Digital Dashboard`
+   - **App name**: `Rep's EduCompass`
    - **User support email**: Your email
    - **Developer contact information**: Your email
 4. Click "Save and Continue"
@@ -48,7 +47,7 @@ This guide will help you set up Google Classroom API access for the Semillero Di
 1. Go to "APIs & Services" → "Credentials"
 2. Click "Create Credentials" → "OAuth 2.0 Client IDs"
 3. Choose "Web application"
-4. Name: `Semillero Digital Web Client`
+4. Name: `Rep's EduCompass Web Client`
 5. Add authorized redirect URIs:
    - `http://localhost:3000/api/auth/callback/google` (for development)
    - `https://your-production-domain.com/api/auth/callback/google` (for production)

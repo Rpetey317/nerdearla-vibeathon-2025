@@ -7,8 +7,8 @@ import { SessionProvider } from '@/components/SessionProvider'
 const inter = Inter({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
-  title: 'Semillero Digital - Dashboard',
-  description: 'Dashboard de gestión para Semillero Digital',
+  title: 'Rep\'s EduCompass - Educational Dashboard',
+  description: 'Navigate student progress with Rep\'s EduCompass - A comprehensive educational dashboard for Semillero Digital',
 }
 
 export default function RootLayout({

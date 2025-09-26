@@ -1,6 +1,6 @@
-# Semillero Digital – Dashboard MVP (T3 style: Next.js + TS + Tailwind)
+# Rep's EduCompass – Educational Dashboard MVP (T3 style: Next.js + TS + Tailwind)
 
-This is an MVP web app built for the Semillero Digital hackathon. It provides a complementary dashboard to Google Classroom focused on:
+This is an MVP web app built for the Semillero Digital hackathon. Rep's EduCompass provides a complementary dashboard to Google Classroom focused on:
 
 - Seguimiento del progreso por alumno, clase y profesor
 - Centro de notificaciones y comunicaciones

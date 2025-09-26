@@ -14,14 +14,48 @@ import {
 } from 'lucide-react';
 import { useState } from 'react';
 import { mockNotifications, mockUsers, mockCourses } from '@/lib/mockData';
-import { formatShortDate } from '@/lib/utils';
+import { formatShortDate, getStatusLabel } from '@/lib/utils';
+import { useRole } from '@/context/role-context';
 
 export default function NotificationsPage() {
-  const [filter, setFilter] = useState<'all' | 'unread' | 'assignment' | 'grade' | 'announcement'>('all');
+  const { role } = useRole();
+  const [filter, setFilter] = useState<'all' | 'unread' | 'assignment' | 'grade' | 'announcement' | 'late_delivery' | 'cell_alert'>('all');
   const [searchTerm, setSearchTerm] = useState('');
 
+  // Add Semillero-specific notifications
+  const semilleroNotifications = [
+    {
+      id: 'notif-semillero-1',
+      userId: 'user-1',
+      title: 'Entregas Tardías en Célula A',
+      message: '3 estudiantes de tu célula tienen entregas tardías esta semana. Revisa el progreso de Ana Martínez, Carlos López y Juan Pérez.',
+      type: 'late_delivery' as const,
+      read: false,
+      createdAt: new Date('2024-01-19T10:00:00')
+    },
+    {
+      id: 'notif-semillero-2', 
+      userId: 'user-2',
+      title: 'Célula con Bajo Rendimiento',
+      message: 'La Célula C - Data Analytics tiene un 69% de completado. Considera programar una sesión de apoyo.',
+      type: 'cell_alert' as const,
+      read: false,
+      createdAt: new Date('2024-01-18T14:30:00')
+    },
+    {
+      id: 'notif-semillero-3',
+      userId: 'user-1',
+      title: 'Nuevas Tareas por Revisar',
+      message: '5 estudiantes entregaron la tarea "SEO Optimization". Pendiente de revisión y calificación.',
+      type: 'assignment' as const,
+      read: true,
+      createdAt: new Date('2024-01-17T16:45:00')
+    }
+  ];
+
   // Enhanced notifications with user and course data
-  const enhancedNotifications = mockNotifications.map(notification => {
+  const allNotifications = [...mockNotifications, ...semilleroNotifications];
+  const enhancedNotifications = allNotifications.map(notification => {
     const user = mockUsers.find(u => u.id === notification.userId);
     return {
       ...notification,
@@ -52,6 +86,10 @@ export default function NotificationsPage() {
         return <MessageSquare className="h-5 w-5 text-purple-500" />;
       case 'reminder':
         return <Clock className="h-5 w-5 text-orange-500" />;
+      case 'late_delivery':
+        return <AlertCircle className="h-5 w-5 text-red-500" />;
+      case 'cell_alert':
+        return <AlertCircle className="h-5 w-5 text-yellow-500" />;
       default:
         return <Bell className="h-5 w-5 text-gray-500" />;
     }
@@ -67,6 +105,10 @@ export default function NotificationsPage() {
         return 'Anuncio';
       case 'reminder':
         return 'Recordatorio';
+      case 'late_delivery':
+        return 'Entrega Tardía';
+      case 'cell_alert':
+        return 'Alerta de Célula';
       default:
         return 'Notificación';
     }

@@ -12,18 +12,47 @@ import {
   Menu, 
   X,
   Home,
-  TrendingUp
+  TrendingUp,
+  UserCheck
 } from 'lucide-react';
 import RoleSwitcher from '@/components/RoleSwitcher';
+import CompassLogo from '@/components/CompassLogo';
+import { useRole } from '@/context/role-context';
 
-const navigation = [
-  { name: 'Dashboard', href: '/', icon: Home },
-  { name: 'Progreso', href: '/progress', icon: TrendingUp },
-  { name: 'Cursos', href: '/courses', icon: BookOpen },
-  { name: 'Estudiantes', href: '/students', icon: Users },
-  { name: 'Notificaciones', href: '/notifications', icon: Bell },
-  { name: 'Métricas', href: '/metrics', icon: BarChart3 },
-];
+const getNavigationForRole = (role: string) => {
+  const baseNavigation = [
+    { name: 'Dashboard', href: '/', icon: Home },
+  ];
+
+  if (role === 'coordinator') {
+    return [
+      ...baseNavigation,
+      { name: 'Células', href: '/cells', icon: Users },
+      { name: 'Progreso', href: '/progress', icon: TrendingUp },
+      { name: 'Cursos', href: '/courses', icon: BookOpen },
+      { name: 'Estudiantes', href: '/students', icon: Users },
+      { name: 'Notificaciones', href: '/notifications', icon: Bell },
+      { name: 'Métricas', href: '/metrics', icon: BarChart3 },
+    ];
+  }
+
+  if (role === 'teacher') {
+    return [
+      ...baseNavigation,
+      { name: 'Mi Célula', href: '/my-cell', icon: UserCheck },
+      { name: 'Progreso', href: '/progress', icon: TrendingUp },
+      { name: 'Notificaciones', href: '/notifications', icon: Bell },
+    ];
+  }
+
+  // Student role
+  return [
+    ...baseNavigation,
+    { name: 'Mi Progreso', href: '/progress', icon: TrendingUp },
+    { name: 'Mis Cursos', href: '/courses', icon: BookOpen },
+    { name: 'Notificaciones', href: '/notifications', icon: Bell },
+  ];
+};
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -32,6 +61,8 @@ interface LayoutProps {
 export default function Layout({ children }: LayoutProps) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const pathname = usePathname();
+  const { role } = useRole();
+  const navigation = getNavigationForRole(role);
 
   return (
     <div className="flex h-screen bg-gray-50">
@@ -49,8 +80,9 @@ export default function Layout({ children }: LayoutProps) {
             </button>
           </div>
           <div className="flex flex-1 flex-col overflow-y-auto pt-5 pb-4">
-            <div className="flex flex-shrink-0 items-center px-4">
-              <h1 className="text-xl font-bold text-primary-600">Semillero Digital</h1>
+            <div className="flex items-center flex-shrink-0 px-4">
+              <CompassLogo size={28} className="mr-3" />
+              <h1 className="text-xl font-bold text-primary-600">Rep's EduCompass</h1>
             </div>
             <nav className="mt-5 flex-1 space-y-1 px-2">
               {navigation.map((item) => {
@@ -80,7 +112,8 @@ export default function Layout({ children }: LayoutProps) {
         <div className="flex flex-1 flex-col min-h-0 bg-white border-r border-gray-200">
           <div className="flex flex-1 flex-col overflow-y-auto pt-5 pb-4">
             <div className="flex items-center flex-shrink-0 px-4">
-              <h1 className="text-xl font-bold text-primary-600">Semillero Digital</h1>
+              <CompassLogo size={28} className="mr-3" />
+              <h1 className="text-xl font-bold text-primary-600">Rep's EduCompass</h1>
             </div>
             <nav className="mt-5 flex-1 px-2 space-y-1">
               {navigation.map((item) => {
@@ -120,8 +153,9 @@ export default function Layout({ children }: LayoutProps) {
               <div className="flex w-full md:ml-0">
                 <div className="relative w-full text-gray-400 focus-within:text-gray-600">
                   <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center">
-                    <h2 className="text-lg font-semibold text-gray-900 ml-3">
-                      Dashboard de Gestión
+                    <CompassLogo size={24} className="ml-3 mr-2" />
+                    <h2 className="text-lg font-semibold text-gray-900">
+                      Rep's EduCompass
                     </h2>
                   </div>
                 </div>

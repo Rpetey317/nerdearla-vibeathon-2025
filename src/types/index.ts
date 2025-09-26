@@ -4,6 +4,8 @@ export interface User {
   name: string;
   role: 'student' | 'teacher' | 'coordinator';
   avatar?: string;
+  cellId?: string; // For teachers - which cell they manage
+  assignedTeacherId?: string; // For students - which teacher they're assigned to
 }
 
 export interface Course {
@@ -32,8 +34,9 @@ export interface Submission {
   studentId: string;
   submittedAt?: Date;
   grade?: number;
-  status: 'pending' | 'submitted' | 'graded' | 'late';
+  status: 'sin_entregar' | 'borrador' | 'entregado' | 'evaluado' | 'tarde' | 'asignado';
   feedback?: string;
+  cellId?: string; // Which cell this student belongs to
 }
 
 export interface Attendance {
@@ -62,4 +65,28 @@ export interface StudentProgress {
   averageGrade: number;
   attendanceRate: number;
   lastActivity: Date;
+  cellId?: string;
+}
+
+// New interface for Semillero's cell structure
+export interface Cell {
+  id: string;
+  name: string;
+  teacherId: string;
+  courseId: string;
+  studentIds: string[];
+  createdAt: Date;
+}
+
+// Metrics interface for coordinator dashboard
+export interface CellMetrics {
+  cellId: string;
+  cellName: string;
+  teacherName: string;
+  totalStudents: number;
+  totalDeliveries: number;
+  lateDeliveries: number;
+  pendingAssignments: number;
+  averageGrade: number;
+  completionRate: number;
 }

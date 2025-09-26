@@ -4,6 +4,7 @@ import { signIn, getSession } from 'next-auth/react';
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { BookOpen, Users, BarChart3 } from 'lucide-react';
+import CompassLogo from '@/components/CompassLogo';
 
 export default function SignIn() {
   const [loading, setLoading] = useState(false);
@@ -32,9 +33,9 @@ export default function SignIn() {
     <div className="min-h-screen bg-gray-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
       <div className="sm:mx-auto sm:w-full sm:max-w-md">
         <div className="flex justify-center">
-          <div className="flex items-center space-x-2">
-            <BookOpen className="h-8 w-8 text-primary-600" />
-            <h1 className="text-2xl font-bold text-gray-900">Semillero Digital</h1>
+          <div className="flex items-center space-x-3">
+            <CompassLogo size={40} />
+            <h1 className="text-2xl font-bold text-gray-900">Rep's EduCompass</h1>
           </div>
         </div>
         <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
