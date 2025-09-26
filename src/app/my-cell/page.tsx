@@ -15,9 +15,10 @@ import { useState, useEffect } from 'react';
 import { getTeacherCell, isUsingMocks } from '@/lib/data-service-enhanced';
 import { getStatusColor, getStatusLabel, formatShortDate } from '@/lib/utils';
 import { useRole } from '@/context/role-context';
+import { TeacherCell, CellStudent, StudentAssignment } from '@/types';
 
 // Mock data for teacher's assigned cell
-const mockTeacherCell = {
+const mockTeacherCell: TeacherCell = {
   id: 'cell-teacher-1',
   name: 'Célula A - E-commerce',
   teacherName: 'Prof. María García',
@@ -81,7 +82,7 @@ const mockTeacherCell = {
 
 export default function MyCellPage() {
   const { role } = useRole();
-  const [cellData, setCellData] = useState<any>(null);
+  const [cellData, setCellData] = useState<TeacherCell | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -140,19 +141,19 @@ export default function MyCellPage() {
   
   // Calculate cell metrics
   const totalAssignments = students[0]?.assignments.length || 0;
-  const totalSubmissions = students.reduce((sum, student) => 
-    sum + student.assignments.filter(a => a.status === 'entregado' || a.status === 'evaluado').length, 0
+  const totalSubmissions = students.reduce((sum: number, student: CellStudent) => 
+    sum + student.assignments.filter((a: StudentAssignment) => a.status === 'entregado' || a.status === 'evaluado').length, 0
   );
-  const lateSubmissions = students.reduce((sum, student) => 
-    sum + student.assignments.filter(a => a.status === 'tarde').length, 0
+  const lateSubmissions = students.reduce((sum: number, student: CellStudent) => 
+    sum + student.assignments.filter((a: StudentAssignment) => a.status === 'tarde').length, 0
   );
-  const pendingReviews = students.reduce((sum, student) => 
-    sum + student.assignments.filter(a => a.status === 'entregado').length, 0
+  const pendingReviews = students.reduce((sum: number, student: CellStudent) => 
+    sum + student.assignments.filter((a: StudentAssignment) => a.status === 'entregado').length, 0
   );
-  const averageCellGrade = students.reduce((sum, student) => sum + student.averageGrade, 0) / students.length;
+  const averageCellGrade = students.reduce((sum: number, student: CellStudent) => sum + student.averageGrade, 0) / students.length;
 
   // Identify students needing attention
-  const studentsNeedingAttention = students.filter(s => s.completionRate < 70 || s.averageGrade < 7);
+  const studentsNeedingAttention = students.filter((s: CellStudent) => s.completionRate < 70 || s.averageGrade < 7);
 
   return (
     <Layout>
@@ -216,7 +217,7 @@ export default function MyCellPage() {
               <h3 className="text-lg font-semibold text-red-800">Estudiantes que Requieren Atención</h3>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {studentsNeedingAttention.map(student => (
+              {studentsNeedingAttention.map((student: CellStudent) => (
                 <div key={student.id} className="bg-white p-3 rounded border">
                   <p className="font-medium text-gray-900">{student.name}</p>
                   <p className="text-sm text-gray-600">
@@ -258,7 +259,7 @@ export default function MyCellPage() {
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
-                {students.map((student) => (
+                {students.map((student: CellStudent) => (
                   <tr key={student.id} className="hover:bg-gray-50">
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div>
@@ -295,7 +296,7 @@ export default function MyCellPage() {
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="flex space-x-1">
-                        {student.assignments.map((assignment, index) => (
+                        {student.assignments.map((assignment: StudentAssignment, index: number) => (
                           <div
                             key={index}
                             className={`w-3 h-3 rounded-full ${getStatusColor(assignment.status).replace('text-', 'bg-').replace('bg-', 'bg-').split(' ')[1]}`}
@@ -323,16 +324,16 @@ export default function MyCellPage() {
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
           <h3 className="text-lg font-semibold text-gray-900 mb-4">Estado de Tareas por Estudiante</h3>
           <div className="space-y-4">
-            {students.map((student) => (
+            {students.map((student: CellStudent) => (
               <div key={student.id} className="border rounded-lg p-4">
                 <div className="flex items-center justify-between mb-3">
                   <h4 className="font-medium text-gray-900">{student.name}</h4>
                   <span className="text-sm text-gray-500">
-                    {student.assignments.filter(a => a.status === 'evaluado').length}/{student.assignments.length} evaluadas
+                    {student.assignments.filter((a: StudentAssignment) => a.status === 'evaluado').length}/{student.assignments.length} evaluadas
                   </span>
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-                  {student.assignments.map((assignment) => (
+                  {student.assignments.map((assignment: StudentAssignment) => (
                     <div key={assignment.id} className="border rounded p-3">
                       <div className="flex items-center justify-between mb-2">
                         <h5 className="text-sm font-medium text-gray-900">{assignment.title}</h5>

@@ -121,14 +121,14 @@ export const mockSubmissions: Submission[] = [
     studentId: '1',
     submittedAt: new Date('2024-09-28'),
     grade: 85,
-    status: 'graded',
+    status: 'evaluado',
     feedback: 'Excelente trabajo en el diseño, mejorar la funcionalidad JavaScript'
   },
   {
     id: '2',
     assignmentId: '1',
     studentId: '2',
-    status: 'pending'
+    status: 'entregado'
   },
   {
     id: '3',
@@ -136,7 +136,7 @@ export const mockSubmissions: Submission[] = [
     studentId: '1',
     submittedAt: new Date('2024-09-29'),
     grade: 92,
-    status: 'graded',
+    status: 'evaluado',
     feedback: 'Muy bien implementado, código limpio y funcional'
   },
   {
@@ -144,7 +144,7 @@ export const mockSubmissions: Submission[] = [
     assignmentId: '2',
     studentId: '4',
     submittedAt: new Date('2024-10-01'),
-    status: 'late'
+    status: 'tarde'
   },
   {
     id: '5',
@@ -152,7 +152,7 @@ export const mockSubmissions: Submission[] = [
     studentId: '1',
     submittedAt: new Date('2024-09-25'),
     grade: 88,
-    status: 'graded'
+    status: 'evaluado'
   }
 ];
 

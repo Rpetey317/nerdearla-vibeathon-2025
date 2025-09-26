@@ -90,3 +90,33 @@ export interface CellMetrics {
   averageGrade: number;
   completionRate: number;
 }
+
+// Extended assignment interface for teacher cell view
+export interface StudentAssignment {
+  id: string;
+  title: string;
+  status: 'sin_entregar' | 'borrador' | 'entregado' | 'evaluado' | 'tarde' | 'asignado';
+  grade: number | null | undefined;
+  dueDate: Date;
+}
+
+// Student with assignments for teacher cell view
+export interface CellStudent {
+  id: string;
+  name: string;
+  email: string;
+  assignments: StudentAssignment[];
+  completionRate: number;
+  averageGrade: number;
+  lastActivity: Date;
+}
+
+// Teacher cell data structure
+export interface TeacherCell {
+  id: string;
+  name: string;
+  teacherName: string;
+  courseId: string;
+  courseName: string;
+  students: CellStudent[];
+}
