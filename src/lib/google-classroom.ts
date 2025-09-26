@@ -9,13 +9,26 @@ const classroom = google.classroom('v1');
 async function getClassroomClient() {
   const session = await getServerSession(authOptions);
   
-  if (!session?.accessToken) {
-    throw new Error('No valid session or access token');
+  if (!session) {
+    throw new Error('No active session found. Please sign in.');
   }
 
-  const auth = new google.auth.OAuth2();
+  if (session.error === 'RefreshAccessTokenError') {
+    throw new Error('Authentication token has expired. Please sign in again.');
+  }
+  
+  if (!session.accessToken) {
+    throw new Error('No valid access token found. Please sign in again.');
+  }
+
+  const auth = new google.auth.OAuth2(
+    process.env.GOOGLE_CLIENT_ID,
+    process.env.GOOGLE_CLIENT_SECRET
+  );
+  
   auth.setCredentials({
     access_token: session.accessToken as string,
+    refresh_token: session.refreshToken as string,
   });
 
   return google.classroom({ version: 'v1', auth });
