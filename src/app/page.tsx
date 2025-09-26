@@ -1,6 +1,7 @@
 'use client';
 
 import Layout from '@/components/Layout';
+import AuthWrapper from '@/components/AuthWrapper';
 import { 
   Users, 
   BookOpen, 
@@ -10,30 +11,109 @@ import {
   AlertCircle,
   Calendar
 } from 'lucide-react';
-import { mockUsers, mockCourses, mockStudentProgress, mockSubmissions, mockNotifications } from '@/lib/mockData';
+import { useState, useEffect } from 'react';
+import { fetchAllCoursesWithData, calculateStudentProgress, generateNotifications } from '@/lib/data-service';
+import { Course, Assignment, Submission, User, StudentProgress, Notification } from '@/types';
 import { getProgressColor, formatShortDate } from '@/lib/utils';
 
 export default function Dashboard() {
+  const [data, setData] = useState<{
+    courses: Course[];
+    assignments: Assignment[];
+    submissions: Submission[];
+    students: User[];
+    progress: StudentProgress[];
+    notifications: Notification[];
+  } | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    async function loadData() {
+      try {
+        setLoading(true);
+        const classroomData = await fetchAllCoursesWithData();
+        const progress = calculateStudentProgress(
+          classroomData.courses,
+          classroomData.assignments,
+          classroomData.submissions
+        );
+        const notifications = generateNotifications(
+          classroomData.assignments,
+          classroomData.submissions,
+          classroomData.students
+        );
+
+        setData({
+          ...classroomData,
+          progress,
+          notifications,
+        });
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'Failed to load data');
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    loadData();
+  }, []);
+
+  if (loading) {
+    return (
+      <AuthWrapper>
+        <Layout>
+          <div className="flex items-center justify-center h-64">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600"></div>
+          </div>
+        </Layout>
+      </AuthWrapper>
+    );
+  }
+
+  if (error) {
+    return (
+      <AuthWrapper>
+        <Layout>
+          <div className="bg-red-50 border border-red-200 rounded-md p-4">
+            <div className="flex">
+              <AlertCircle className="h-5 w-5 text-red-400" />
+              <div className="ml-3">
+                <h3 className="text-sm font-medium text-red-800">Error loading data</h3>
+                <div className="mt-2 text-sm text-red-700">
+                  <p>{error}</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </Layout>
+      </AuthWrapper>
+    );
+  }
+
+  if (!data) return null;
+
   // Calculate dashboard stats
-  const totalStudents = mockUsers.filter(u => u.role === 'student').length;
-  const totalCourses = mockCourses.length;
-  const totalSubmissions = mockSubmissions.length;
-  const pendingSubmissions = mockSubmissions.filter(s => s.status === 'pending').length;
-  const unreadNotifications = mockNotifications.filter(n => !n.read).length;
+  const totalStudents = data.students.length;
+  const totalCourses = data.courses.length;
+  const totalSubmissions = data.submissions.length;
+  const pendingSubmissions = data.submissions.filter(s => s.status === 'pending').length;
+  const unreadNotifications = data.notifications.filter(n => !n.read).length;
 
   // Get recent activity
-  const recentSubmissions = mockSubmissions
+  const recentSubmissions = data.submissions
     .filter(s => s.submittedAt)
     .sort((a, b) => new Date(b.submittedAt!).getTime() - new Date(a.submittedAt!).getTime())
     .slice(0, 5);
 
   // Get students with low progress
-  const studentsAtRisk = mockStudentProgress
+  const studentsAtRisk = data.progress
     .filter(p => p.attendanceRate < 70 || (p.assignmentsCompleted / p.totalAssignments) < 0.5)
     .slice(0, 3);
 
   return (
-    <Layout>
+    <AuthWrapper>
+      <Layout>
       <div className="space-y-6">
         {/* Header */}
         <div>
@@ -127,8 +207,8 @@ export default function Dashboard() {
               </h3>
               <div className="space-y-3">
                 {recentSubmissions.map((submission) => {
-                  const student = mockUsers.find(u => u.id === submission.studentId);
-                  const assignment = mockSubmissions.find(s => s.id === submission.id);
+                  const student = data.students.find(u => u.id === submission.studentId);
+                  const assignment = data.assignments.find(a => a.id === submission.assignmentId);
                   
                   return (
                     <div key={submission.id} className="flex items-center space-x-3">
@@ -165,8 +245,8 @@ export default function Dashboard() {
               </h3>
               <div className="space-y-4">
                 {studentsAtRisk.map((progress) => {
-                  const student = mockUsers.find(u => u.id === progress.studentId);
-                  const course = mockCourses.find(c => c.id === progress.courseId);
+                  const student = data.students.find(u => u.id === progress.studentId);
+                  const course = data.courses.find(c => c.id === progress.courseId);
                   const completionRate = (progress.assignmentsCompleted / progress.totalAssignments) * 100;
                   
                   return (
@@ -200,8 +280,8 @@ export default function Dashboard() {
               Resumen de Cursos
             </h3>
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-              {mockCourses.map((course) => {
-                const teacher = mockUsers.find(u => u.id === course.teacherId);
+              {data.courses.map((course) => {
+                const teacher = data.students.find(u => u.id === course.teacherId);
                 const studentsInCourse = course.students.length;
                 
                 return (
@@ -232,6 +312,7 @@ export default function Dashboard() {
           </div>
         </div>
       </div>
-    </Layout>
+      </Layout>
+    </AuthWrapper>
   );
 }
