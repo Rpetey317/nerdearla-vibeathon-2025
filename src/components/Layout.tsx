@@ -82,7 +82,7 @@ export default function Layout({ children }: LayoutProps) {
           <div className="flex flex-1 flex-col overflow-y-auto pt-5 pb-4">
             <div className="flex items-center flex-shrink-0 px-4">
               <CompassLogo size={28} className="mr-3" />
-              <h1 className="text-xl font-bold text-primary-600">Rep's EduCompass</h1>
+              <h1 className="text-xl font-bold text-primary-600">Rep&apos;s EduCompass</h1>
             </div>
             <nav className="mt-5 flex-1 space-y-1 px-2">
               {navigation.map((item) => {
@@ -113,7 +113,7 @@ export default function Layout({ children }: LayoutProps) {
           <div className="flex flex-1 flex-col overflow-y-auto pt-5 pb-4">
             <div className="flex items-center flex-shrink-0 px-4">
               <CompassLogo size={28} className="mr-3" />
-              <h1 className="text-xl font-bold text-primary-600">Rep's EduCompass</h1>
+              <h1 className="text-xl font-bold text-primary-600">Rep&apos;s EduCompass</h1>
             </div>
             <nav className="mt-5 flex-1 px-2 space-y-1">
               {navigation.map((item) => {
@@ -155,7 +155,7 @@ export default function Layout({ children }: LayoutProps) {
                   <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center">
                     <CompassLogo size={24} className="ml-3 mr-2" />
                     <h2 className="text-lg font-semibold text-gray-900">
-                      Rep's EduCompass
+                      Rep&apos;s EduCompass
                     </h2>
                   </div>
                 </div>

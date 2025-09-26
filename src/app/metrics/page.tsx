@@ -1,26 +1,90 @@
 'use client';
 
 import Layout from '@/components/Layout';
-import { mockStudentProgress, mockSubmissions, mockAssignments, mockAttendance, mockCourses } from '@/lib/mockData';
+import { useState, useEffect } from 'react';
+import { fetchAllCoursesWithData, calculateStudentProgress, isUsingMocks } from '@/lib/data-service-enhanced';
 import { BarChart3, Activity, PieChart, Calendar, CheckCircle, Clock } from 'lucide-react';
+import { Course, Assignment, Submission, StudentProgress } from '@/types';
 
 export default function MetricsPage() {
-  const totalStudentsTracked = new Set(mockStudentProgress.map(p => p.studentId)).size;
+  const [courses, setCourses] = useState<Course[]>([]);
+  const [assignments, setAssignments] = useState<Assignment[]>([]);
+  const [submissions, setSubmissions] = useState<Submission[]>([]);
+  const [progress, setProgress] = useState<StudentProgress[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function loadData() {
+      try {
+        const data = await fetchAllCoursesWithData();
+        const progressData = calculateStudentProgress(data.courses, data.assignments, data.submissions);
+        
+        setCourses(data.courses);
+        setAssignments(data.assignments);
+        setSubmissions(data.submissions);
+        setProgress(progressData);
+      } catch (error) {
+        console.error('Error loading metrics data:', error);
+        setCourses([]);
+        setAssignments([]);
+        setSubmissions([]);
+        setProgress([]);
+      } finally {
+        setLoading(false);
+      }
+    }
+    loadData();
+  }, []);
+
+  if (loading) {
+    return (
+      <Layout>
+        <div className="flex items-center justify-center h-64">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600"></div>
+        </div>
+      </Layout>
+    );
+  }
+
+  // Show empty state if no data
+  if (progress.length === 0) {
+    return (
+      <Layout>
+        <div className="space-y-6">
+          <div>
+            <h1 className="text-2xl font-bold text-gray-900">Métricas y Análisis</h1>
+            <p className="mt-1 text-sm text-gray-500">Análisis detallado del rendimiento académico</p>
+          </div>
+          
+          <div className="text-center py-12">
+            <BarChart3 className="mx-auto h-12 w-12 text-gray-400" />
+            <h3 className="mt-2 text-sm font-medium text-gray-900">No hay datos de métricas disponibles</h3>
+            <p className="mt-1 text-sm text-gray-500">
+              {isUsingMocks() 
+                ? 'Los datos de demostración no están disponibles.' 
+                : 'Conecta tu cuenta de Google Classroom para ver las métricas.'}
+            </p>
+          </div>
+        </div>
+      </Layout>
+    );
+  }
+  const totalStudentsTracked = new Set(progress.map(p => p.studentId)).size;
   const avgCompletion = Math.round(
-    mockStudentProgress.reduce((sum, p) => sum + (p.assignmentsCompleted / p.totalAssignments) * 100, 0) / mockStudentProgress.length
+    progress.reduce((sum, p) => sum + (p.assignmentsCompleted / p.totalAssignments) * 100, 0) / progress.length
   );
   const avgAttendance = Math.round(
-    mockStudentProgress.reduce((sum, p) => sum + p.attendanceRate, 0) / mockStudentProgress.length
+    progress.reduce((sum, p) => sum + p.attendanceRate, 0) / progress.length
   );
-  const graded = mockSubmissions.filter(s => s.status === 'evaluado').length;
-  const submitted = mockSubmissions.filter(s => s.status === 'entregado').length;
-  const late = mockSubmissions.filter(s => s.status === 'tarde').length;
-  const pending = mockSubmissions.filter(s => s.status === 'sin_entregar').length;
+  const graded = submissions.filter(s => s.status === 'evaluado').length;
+  const submitted = submissions.filter(s => s.status === 'entregado').length;
+  const late = submissions.filter(s => s.status === 'tarde').length;
+  const pending = submissions.filter(s => s.status === 'sin_entregar').length;
 
-  const courseAgg = mockCourses.map(c => {
-    const progress = mockStudentProgress.filter(p => p.courseId === c.id);
-    const completion = progress.length ? Math.round(progress.reduce((sum, p) => sum + (p.assignmentsCompleted / p.totalAssignments) * 100, 0) / progress.length) : 0;
-    const attendance = progress.length ? Math.round(progress.reduce((sum, p) => sum + p.attendanceRate, 0) / progress.length) : 0;
+  const courseAgg = courses.map(c => {
+    const courseProgress = progress.filter(p => p.courseId === c.id);
+    const completion = courseProgress.length ? Math.round(courseProgress.reduce((sum, p) => sum + (p.assignmentsCompleted / p.totalAssignments) * 100, 0) / courseProgress.length) : 0;
+    const attendance = courseProgress.length ? Math.round(courseProgress.reduce((sum, p) => sum + p.attendanceRate, 0) / courseProgress.length) : 0;
     return { id: c.id, name: c.name, completion, attendance };
   });
 

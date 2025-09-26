@@ -1,0 +1,26 @@
+Uso de Classroom en Semillero Digital 📚
+0:01 Buenas a todos. Mi nombre es Axel y les voy a dar un poco un recorrido de cómo usamos Classroom en Semillero Digital.
+0:09 Classroom, para el que no lo conoce, es una herramienta que sirve para gestionar contenidos en distintos tipos de cursos. y para distintas organizaciones educativas.
+0:20 Nosotros tenemos ordenado el Classroom con una instancia de cada uno para, una instancia de cada Classroom para cada curso distinto que tenemos.
+0:32 Entonces, Entonces, en este caso, como ejemplo, la vertical e-commerce y data, van a ver que están ordenados en un tablón principal con notificaciones, las personas que componen al curso, que son los profesores, y todo el los alumnos, en este caso hay unos 144 alumnos y todos los distintos profesores
+0:54 de práctica que son los que hacen el seguimiento de los alumnos y les corrigen las tareas a estos alumnos. Van a ver también que el trabajo de clase Nosotros lo cargamos en distintas tareas que después se envían vía mail a los alumnos.
+1:12 O sea, en el momento en que el profesor de teoría, que es el titular del módulo, carga una de estas tareas, se le notifica, se la asigna a todos los alumnos y se les notifica a todos ellos sobre la que le llegó, que le llegó esta tarea y así tanto los alumnos como los profesores saben en el momento en
+1:32 que se lanzan las tareas y cuáles son las cuáles son las Son los requerimientos, por ejemplo, en este caso la tarea que se cargó esta semana, que tiene fecha de entrega para esta semana, el profesor cargó las instrucciones de qué es lo que tiene que hacer, se las asignó a todos los alumnos y ya hay algunos
+1:52 pasos que la tienen entregada, otros que la tienen evaluada y el 118 la tienen asignada. Al ver las instrucciones se puede también ver un poco más de detalle de cada una de las tareas y en la solapa de trabajo de los alumnos ver el estado de cada uno de los alumnos.
+2:08 O sea, acá vemos que por ejemplo hay 25 alumnos entregados que tienen este detalle, 118 todavía están asignados y no lo entregaron y hay una tarea que está evaluada.
+2:21 Lo que nos pasa a nosotros en Semillero, la problemática principal que tenemos es El problema que tenemos al usar Classroom es que se hace difícil la gestión con el volumen de gente que tenemos.
+2:30 Nos pasan cosas como que necesitamos saber de forma rápida y de notificar a todos los alumnos quienes son los que tienen tareas enteras.
+2:40 ¿Quiénes son las que la entregaron tarde? ¿Quiénes son los que necesitan un poco más de apoyo? Y ver, por ejemplo, las calificaciones de cada uno.
+2:49 Y otras cosas que nos pasan es, por ejemplo, nosotros tenemos todos los profesores que están acá. Cada profesor tiene asignado una un grupo de alumnos, pero sin embargo Classroom no nos deja poder asignar ese, poder segmentar entre profesores y alumnos, entonces lo que estamos pensando es que necesitamos
+3:06 una capa de reportería por encima de Classroom que le muestra a los profesores. solamente sus alumnos. Una forma de hacer eso, por ejemplo, si vamos acá en la solapa de calificaciones, hay una tabla, Classroom muestra una tabla con todas las tareas y todas las calificaciones de los distintos alumnos 
+3:26 y el estado de cada una de estas. el estado de cabo en estas tareas. Si está sin entregar, si está en borrador, si está en las notificaciones, etcétera.
+3:36 Otra forma también de acceder desde la plataforma a las distintas tareas Es entrar directamente al alumno, que hoy con 144 alumnos es un poco más engorroso, pero cada profesor podría entrar al detalle de alumno, a cada uno de sus alumnos, y ver en qué estado está cada uno.
+4:00 a esas tareas y acá genera un link, en ver detalles, muestra el link directo a la tarea esa para mostrar.
+4:12 Entonces, como pueden llegar a ver, esta fórmula que La forma que tiene Classroom de operar no es escalable, entonces lo que estamos necesitando hoy en día es que vía la API de Classroom, que sabemos que existe y que tiene muchas funcionalidades, poder tener una forma ágil para los distintos profesores
+4:31 de, identificar a sus alumnos, a los alumnos que tienen asignados. Nosotros tenemos un listado que relaciona, en un Google Sheet, que relaciona alumnos con profesores.
+4:41 Cada profesor tiene una cantidad de alumnos asignados, entonces es poder, con un vía login o con el mismo mail que ya tienen, que se tienen loggeado en Classroom.
+4:52 Tienen un listado de cómo le va a cada uno de sus alumnos sin tener que entrar uno por uno y verlo así.
+4:57 Y después el otro requerimiento que tenemos también es que necesitamos que alguien queje, el El grupo de coordinadores de los distintos módulos tengan una posibilidad de ver qué es lo que sucede con todos los alumnos.
+5:13 Métricas como asistencia, métricas como cómo están entregando las tareas y las están ejecutando. entrenando tarde, si tienen tareas pendientes y cuáles son la calificación y cuáles son los distintos comentarios que recibieron de sus profesores.
+5:29 Eso también es lo mismo, hay que entrar tarea por tarea para entender y es difícil poder identificar una, obtener una vista de todo.
+5:36 a modo de tablero de controles que es lo que pasa con cada uno de los cursos.

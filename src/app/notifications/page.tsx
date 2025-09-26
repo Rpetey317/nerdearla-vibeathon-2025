@@ -12,8 +12,9 @@ import {
   Filter,
   Search
 } from 'lucide-react';
-import { useState } from 'react';
-import { mockNotifications, mockUsers, mockCourses } from '@/lib/mockData';
+import { useState, useEffect } from 'react';
+import { generateNotifications, fetchAllCoursesWithData, getAllUsers, isUsingMocks } from '@/lib/data-service-enhanced';
+import { Notification, User, Course } from '@/types';
 import { formatShortDate, getStatusLabel } from '@/lib/utils';
 import { useRole } from '@/context/role-context';
 
@@ -21,6 +22,63 @@ export default function NotificationsPage() {
   const { role } = useRole();
   const [filter, setFilter] = useState<'all' | 'unread' | 'assignment' | 'grade' | 'announcement' | 'late_delivery' | 'cell_alert'>('all');
   const [searchTerm, setSearchTerm] = useState('');
+  const [notifications, setNotifications] = useState<Notification[]>([]);
+  const [users, setUsers] = useState<User[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function loadData() {
+      try {
+        const data = await fetchAllCoursesWithData();
+        const allUsers = getAllUsers();
+        const notificationsData = generateNotifications(data.assignments, data.submissions, data.students);
+        
+        setNotifications(notificationsData);
+        setUsers(allUsers);
+      } catch (error) {
+        console.error('Error loading notifications:', error);
+        setNotifications([]);
+        setUsers([]);
+      } finally {
+        setLoading(false);
+      }
+    }
+    loadData();
+  }, []);
+
+  if (loading) {
+    return (
+      <Layout>
+        <div className="flex items-center justify-center h-64">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600"></div>
+        </div>
+      </Layout>
+    );
+  }
+
+  // Show empty state if no notifications
+  if (notifications.length === 0) {
+    return (
+      <Layout>
+        <div className="space-y-6">
+          <div>
+            <h1 className="text-2xl font-bold text-gray-900">Notificaciones</h1>
+            <p className="mt-1 text-sm text-gray-500">Centro de notificaciones y alertas</p>
+          </div>
+          
+          <div className="text-center py-12">
+            <Bell className="mx-auto h-12 w-12 text-gray-400" />
+            <h3 className="mt-2 text-sm font-medium text-gray-900">No hay notificaciones disponibles</h3>
+            <p className="mt-1 text-sm text-gray-500">
+              {isUsingMocks() 
+                ? 'Los datos de demostración no están disponibles.' 
+                : 'Conecta tu cuenta de Google Classroom para ver las notificaciones.'}
+            </p>
+          </div>
+        </div>
+      </Layout>
+    );
+  }
 
   // Add Semillero-specific notifications
   const semilleroNotifications = [
@@ -54,9 +112,9 @@ export default function NotificationsPage() {
   ];
 
   // Enhanced notifications with user and course data
-  const allNotifications = [...mockNotifications, ...semilleroNotifications];
+  const allNotifications = [...notifications, ...semilleroNotifications];
   const enhancedNotifications = allNotifications.map(notification => {
-    const user = mockUsers.find(u => u.id === notification.userId);
+    const user = users.find(u => u.id === notification.userId);
     return {
       ...notification,
       user

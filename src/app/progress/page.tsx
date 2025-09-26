@@ -4,31 +4,99 @@ import Layout from '@/components/Layout';
 import { 
   TrendingUp, 
   TrendingDown, 
-  Calendar,
-  Clock,
-  CheckCircle,
+  CheckCircle, 
+  Clock, 
   AlertTriangle,
   User
 } from 'lucide-react';
-import { mockUsers, mockCourses, mockStudentProgress, mockSubmissions, mockAssignments } from '@/lib/mockData';
+import { useState, useEffect } from 'react';
+import { fetchAllCoursesWithData, calculateStudentProgress, getAllUsers, isUsingMocks } from '@/lib/data-service-enhanced';
 import { getProgressColor, formatShortDate } from '@/lib/utils';
+import { User as UserType, Course, StudentProgress, Assignment, Submission } from '@/types';
 
 export default function ProgressPage() {
-  const students = mockUsers.filter(u => u.role === 'student');
+  const [users, setUsers] = useState<UserType[]>([]);
+  const [courses, setCourses] = useState<Course[]>([]);
+  const [progress, setProgress] = useState<StudentProgress[]>([]);
+  const [assignments, setAssignments] = useState<Assignment[]>([]);
+  const [submissions, setSubmissions] = useState<Submission[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function loadData() {
+      try {
+        const data = await fetchAllCoursesWithData();
+        const allUsers = getAllUsers();
+        const progressData = calculateStudentProgress(data.courses, data.assignments, data.submissions);
+        
+        setUsers(allUsers);
+        setCourses(data.courses);
+        setProgress(progressData);
+        setAssignments(data.assignments);
+        setSubmissions(data.submissions);
+      } catch (error) {
+        console.error('Error loading progress data:', error);
+        setUsers([]);
+        setCourses([]);
+        setProgress([]);
+        setAssignments([]);
+        setSubmissions([]);
+      } finally {
+        setLoading(false);
+      }
+    }
+    loadData();
+  }, []);
+
+  if (loading) {
+    return (
+      <Layout>
+        <div className="flex items-center justify-center h-64">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600"></div>
+        </div>
+      </Layout>
+    );
+  }
+
+  // Show empty state if no progress data
+  if (progress.length === 0) {
+    return (
+      <Layout>
+        <div className="space-y-6">
+          <div>
+            <h1 className="text-2xl font-bold text-gray-900">Progreso Académico</h1>
+            <p className="mt-1 text-sm text-gray-500">Seguimiento del progreso de estudiantes</p>
+          </div>
+          
+          <div className="text-center py-12">
+            <TrendingUp className="mx-auto h-12 w-12 text-gray-400" />
+            <h3 className="mt-2 text-sm font-medium text-gray-900">No hay datos de progreso disponibles</h3>
+            <p className="mt-1 text-sm text-gray-500">
+              {isUsingMocks() 
+                ? 'Los datos de demostración no están disponibles.' 
+                : 'Conecta tu cuenta de Google Classroom para ver el progreso.'}
+            </p>
+          </div>
+        </div>
+      </Layout>
+    );
+  }
+
+  const students = users.filter(u => u.role === 'student');
 
   // Enhanced progress data with additional calculations
-  const enhancedProgress = mockStudentProgress.map(progress => {
-    const student = mockUsers.find(u => u.id === progress.studentId);
-    const course = mockCourses.find(c => c.id === progress.courseId);
-    const studentSubmissions = mockSubmissions.filter(s => s.studentId === progress.studentId);
-    const courseAssignments = mockAssignments.filter(a => a.courseId === progress.courseId);
+  const enhancedProgress = progress.map(progressItem => {
+    const student = users.find(u => u.id === progressItem.studentId);
+    const course = courses.find(c => c.id === progressItem.courseId);
+    const studentSubmissions = submissions.filter(s => s.studentId === progressItem.studentId);
+    const courseAssignments = assignments.filter(a => a.courseId === progressItem.courseId);
     
-    const completionRate = (progress.assignmentsCompleted / progress.totalAssignments) * 100;
+    const completionRate = (progressItem.assignmentsCompleted / progressItem.totalAssignments) * 100;
     const onTimeSubmissions = studentSubmissions.filter(s => s.status !== 'tarde' && s.status !== 'sin_entregar').length;
     const onTimeRate = studentSubmissions.length > 0 ? (onTimeSubmissions / studentSubmissions.length) * 100 : 0;
     
     return {
-      ...progress,
+      ...progressItem,
       student,
       course,
       completionRate,
@@ -267,9 +335,9 @@ export default function ProgressPage() {
               Progreso Detallado por Curso
             </h3>
             <div className="space-y-6">
-              {mockCourses.map((course) => {
+              {courses.map((course) => {
                 const courseProgress = enhancedProgress.filter(p => p.courseId === course.id);
-                const teacher = mockUsers.find(u => u.id === course.teacherId);
+                const teacher = users.find(u => u.id === course.teacherId);
                 
                 return (
                   <div key={course.id} className="border border-gray-200 rounded-lg p-4">

@@ -2,17 +2,79 @@
 
 import Layout from '@/components/Layout';
 import { BookOpen, Users, Calendar, PlusCircle } from 'lucide-react';
-import { mockCourses, mockUsers, mockAssignments } from '@/lib/mockData';
+import { useState, useEffect } from 'react';
+import { fetchAllCoursesWithData, getAllUsers, isUsingMocks } from '@/lib/data-service-enhanced';
 import { formatShortDate } from '@/lib/utils';
 import { useRole } from '@/context/role-context';
+import { Course, Assignment, User } from '@/types';
 
 export default function CoursesPage() {
   const { role } = useRole();
+  const [courses, setCourses] = useState<Course[]>([]);
+  const [assignments, setAssignments] = useState<Assignment[]>([]);
+  const [users, setUsers] = useState<User[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  const enhanced = mockCourses.map(c => {
-    const teacher = mockUsers.find(u => u.id === c.teacherId);
-    const assignments = mockAssignments.filter(a => a.courseId === c.id);
-    return { ...c, teacher, assignments };
+  useEffect(() => {
+    async function loadData() {
+      try {
+        const data = await fetchAllCoursesWithData();
+        const allUsers = getAllUsers();
+        setCourses(data.courses);
+        setAssignments(data.assignments);
+        setUsers(allUsers);
+      } catch (error) {
+        console.error('Error loading courses:', error);
+        setCourses([]);
+        setAssignments([]);
+        setUsers([]);
+      } finally {
+        setLoading(false);
+      }
+    }
+    loadData();
+  }, []);
+
+  if (loading) {
+    return (
+      <Layout>
+        <div className="flex items-center justify-center h-64">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600"></div>
+        </div>
+      </Layout>
+    );
+  }
+
+  // Show empty state if no courses
+  if (courses.length === 0) {
+    return (
+      <Layout>
+        <div className="space-y-6">
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-2xl font-bold text-gray-900">Cursos</h1>
+              <p className="mt-1 text-sm text-gray-500">Lista de cursos activos y próximas entregas</p>
+            </div>
+          </div>
+          
+          <div className="text-center py-12">
+            <BookOpen className="mx-auto h-12 w-12 text-gray-400" />
+            <h3 className="mt-2 text-sm font-medium text-gray-900">No hay cursos disponibles</h3>
+            <p className="mt-1 text-sm text-gray-500">
+              {isUsingMocks() 
+                ? 'Los datos de demostración no están disponibles.' 
+                : 'Conecta tu cuenta de Google Classroom para ver los cursos.'}
+            </p>
+          </div>
+        </div>
+      </Layout>
+    );
+  }
+
+  const enhanced = courses.map(c => {
+    const teacher = users.find(u => u.id === c.teacherId);
+    const courseAssignments = assignments.filter(a => a.courseId === c.id);
+    return { ...c, teacher, assignments: courseAssignments };
   });
 
   return (

@@ -35,7 +35,7 @@ export default function SignIn() {
         <div className="flex justify-center">
           <div className="flex items-center space-x-3">
             <CompassLogo size={40} />
-            <h1 className="text-2xl font-bold text-gray-900">Rep's EduCompass</h1>
+            <h1 className="text-2xl font-bold text-gray-900">Rep&apos;s EduCompass</h1>
           </div>
         </div>
         <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">

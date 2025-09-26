@@ -13,59 +13,7 @@ import {
 } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { getCellMetrics, isUsingMocks } from '@/lib/data-service-enhanced';
-import { getStatusColor, getStatusLabel, getProgressColor } from '@/lib/utils';
-
-// Mock data for cells (this would come from API)
-const mockCells = [
-  {
-    id: 'cell-1',
-    name: 'Célula A - E-commerce',
-    teacherName: 'Prof. María García',
-    courseId: 'course-1',
-    totalStudents: 8,
-    totalDeliveries: 24,
-    lateDeliveries: 3,
-    pendingAssignments: 5,
-    averageGrade: 8.2,
-    completionRate: 87.5
-  },
-  {
-    id: 'cell-2',
-    name: 'Célula B - E-commerce',
-    teacherName: 'Prof. Juan Pérez',
-    courseId: 'course-1',
-    totalStudents: 8,
-    totalDeliveries: 22,
-    lateDeliveries: 1,
-    pendingAssignments: 2,
-    averageGrade: 9.1,
-    completionRate: 95.8
-  },
-  {
-    id: 'cell-3',
-    name: 'Célula C - Data Analytics',
-    teacherName: 'Prof. Ana López',
-    courseId: 'course-2',
-    totalStudents: 7,
-    totalDeliveries: 18,
-    lateDeliveries: 6,
-    pendingAssignments: 8,
-    averageGrade: 7.3,
-    completionRate: 69.2
-  },
-  {
-    id: 'cell-4',
-    name: 'Célula D - Data Analytics',
-    teacherName: 'Prof. Carlos Ruiz',
-    courseId: 'course-2',
-    totalStudents: 8,
-    totalDeliveries: 20,
-    lateDeliveries: 2,
-    pendingAssignments: 4,
-    averageGrade: 8.7,
-    completionRate: 83.3
-  }
-];
+import { getProgressColor } from '@/lib/utils';
 
 export default function CellsPage() {
   const [cells, setCells] = useState<any[]>([]);
@@ -196,10 +144,10 @@ export default function CellsPage() {
         {/* Cells Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {cells.map((cell) => (
-            <div key={cell.id} className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+            <div key={cell.cellId} className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
               <div className="flex items-center justify-between mb-4">
                 <div>
-                  <h3 className="text-lg font-semibold text-gray-900">{cell.name}</h3>
+                  <h3 className="text-lg font-semibold text-gray-900">{cell.cellName}</h3>
                   <p className="text-sm text-gray-600">{cell.teacherName}</p>
                 </div>
                 <div className={`px-3 py-1 rounded-full text-xs font-medium ${getProgressColor(cell.completionRate)}`}>
