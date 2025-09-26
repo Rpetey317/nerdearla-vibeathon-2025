@@ -118,7 +118,7 @@ export function calculateStudentProgress(
       );
       
       const completedAssignments = studentSubmissions.filter(
-        s => s.status === 'submitted' || s.status === 'graded'
+        s => s.status === 'entregado' || s.status === 'evaluado'
       ).length;
       
       const gradedSubmissions = studentSubmissions.filter(s => s.grade !== undefined);
@@ -179,7 +179,7 @@ export function generateNotifications(
   
   // New grades
   const recentGrades = submissions.filter(
-    s => s.status === 'graded' && s.grade !== undefined
+    s => s.status === 'evaluado' && s.grade !== undefined
   );
   
   recentGrades.forEach(submission => {

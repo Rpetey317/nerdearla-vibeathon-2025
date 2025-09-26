@@ -99,7 +99,7 @@ export default function Dashboard() {
   const totalStudents = data.students.length;
   const totalCourses = data.courses.length;
   const totalSubmissions = data.submissions.length;
-  const pendingSubmissions = data.submissions.filter(s => s.status === 'asignado' || s.status === 'pending').length;
+  const pendingSubmissions = data.submissions.filter(s => s.status === 'asignado' || s.status === 'sin_entregar').length;
   const unreadNotifications = data.notifications.filter(n => !n.read).length;
 
   // Get recent activity

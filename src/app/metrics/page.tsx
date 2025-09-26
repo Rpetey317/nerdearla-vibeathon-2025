@@ -12,10 +12,10 @@ export default function MetricsPage() {
   const avgAttendance = Math.round(
     mockStudentProgress.reduce((sum, p) => sum + p.attendanceRate, 0) / mockStudentProgress.length
   );
-  const graded = mockSubmissions.filter(s => s.status === 'graded').length;
-  const submitted = mockSubmissions.filter(s => s.status === 'submitted').length;
-  const late = mockSubmissions.filter(s => s.status === 'late').length;
-  const pending = mockSubmissions.filter(s => s.status === 'pending').length;
+  const graded = mockSubmissions.filter(s => s.status === 'evaluado').length;
+  const submitted = mockSubmissions.filter(s => s.status === 'entregado').length;
+  const late = mockSubmissions.filter(s => s.status === 'tarde').length;
+  const pending = mockSubmissions.filter(s => s.status === 'sin_entregar').length;
 
   const courseAgg = mockCourses.map(c => {
     const progress = mockStudentProgress.filter(p => p.courseId === c.id);

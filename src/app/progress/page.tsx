@@ -24,7 +24,7 @@ export default function ProgressPage() {
     const courseAssignments = mockAssignments.filter(a => a.courseId === progress.courseId);
     
     const completionRate = (progress.assignmentsCompleted / progress.totalAssignments) * 100;
-    const onTimeSubmissions = studentSubmissions.filter(s => s.status !== 'tarde' && s.status !== 'late').length;
+    const onTimeSubmissions = studentSubmissions.filter(s => s.status !== 'tarde' && s.status !== 'sin_entregar').length;
     const onTimeRate = studentSubmissions.length > 0 ? (onTimeSubmissions / studentSubmissions.length) * 100 : 0;
     
     return {
