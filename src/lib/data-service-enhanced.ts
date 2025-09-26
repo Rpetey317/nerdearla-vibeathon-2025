@@ -13,7 +13,7 @@ import {
   generateNotifications as generateRealNotifications 
 } from './data-service';
 
-const USE_MOCKS = process.env.USE_MOCKS === 'true';
+const USE_MOCKS = process.env.NEXT_PUBLIC_USE_MOCKS === 'true';
 
 export async function fetchAllCoursesWithData(): Promise<{
   courses: Course[];
@@ -22,15 +22,17 @@ export async function fetchAllCoursesWithData(): Promise<{
   students: User[];
 }> {
   if (USE_MOCKS) {
-    // Return enhanced mock data
-    return {
+    // Return enhanced mock data immediately
+    console.log('Using mock data for demo');
+    return Promise.resolve({
       courses: mockCoursesEnhanced,
       assignments: mockAssignmentsEnhanced,
       submissions: mockSubmissionsEnhanced,
       students: mockUsersEnhanced.filter(u => u.role === 'student')
-    };
+    });
   } else {
-    // Use real Google Classroom data
+    // Use real Google Classroom data via API routes
+    console.log('Using real Google Classroom data');
     return await fetchRealData();
   }
 }
