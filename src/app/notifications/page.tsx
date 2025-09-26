@@ -23,6 +23,7 @@ export default function NotificationsPage() {
   const [filter, setFilter] = useState<'all' | 'unread' | 'assignment' | 'grade' | 'announcement' | 'late_delivery' | 'cell_alert'>('all');
   const [searchTerm, setSearchTerm] = useState('');
   const [notifications, setNotifications] = useState<Notification[]>([]);
+  const [semilleroNotifications, setSemilleroNotifications] = useState<Notification[]>([]);
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -35,6 +36,38 @@ export default function NotificationsPage() {
         
         setNotifications(notificationsData);
         setUsers(allUsers);
+        
+        // Initialize Semillero-specific notifications
+        const initialSemilleroNotifications = [
+          {
+            id: 'notif-semillero-1',
+            userId: 'user-1',
+            title: 'Entregas Tardías en Célula A',
+            message: '3 estudiantes de tu célula tienen entregas tardías esta semana. Revisa el progreso de Ana Martínez, Carlos López y Juan Pérez.',
+            type: 'late_delivery' as const,
+            read: false,
+            createdAt: new Date('2024-01-19T10:00:00')
+          },
+          {
+            id: 'notif-semillero-2', 
+            userId: 'user-2',
+            title: 'Célula con Bajo Rendimiento',
+            message: 'La Célula C - Data Analytics tiene un 69% de completado. Considera programar una sesión de apoyo.',
+            type: 'cell_alert' as const,
+            read: false,
+            createdAt: new Date('2024-01-18T14:30:00')
+          },
+          {
+            id: 'notif-semillero-3',
+            userId: 'user-1',
+            title: 'Nuevas Tareas por Revisar',
+            message: '5 estudiantes entregaron la tarea "SEO Optimization". Pendiente de revisión y calificación.',
+            type: 'assignment' as const,
+            read: true,
+            createdAt: new Date('2024-01-17T16:45:00')
+          }
+        ];
+        setSemilleroNotifications(initialSemilleroNotifications);
       } catch (error) {
         console.error('Error loading notifications:', error);
         setNotifications([]);
@@ -45,6 +78,38 @@ export default function NotificationsPage() {
     }
     loadData();
   }, []);
+
+  // Function to mark a single notification as read
+  const markAsRead = (notificationId: string) => {
+    // Check if it's a semillero notification
+    if (notificationId.startsWith('notif-semillero-')) {
+      setSemilleroNotifications(prevNotifications => 
+        prevNotifications.map(notification => 
+          notification.id === notificationId 
+            ? { ...notification, read: true }
+            : notification
+        )
+      );
+    } else {
+      setNotifications(prevNotifications => 
+        prevNotifications.map(notification => 
+          notification.id === notificationId 
+            ? { ...notification, read: true }
+            : notification
+        )
+      );
+    }
+  };
+
+  // Function to mark all notifications as read
+  const markAllAsRead = () => {
+    setNotifications(prevNotifications => 
+      prevNotifications.map(notification => ({ ...notification, read: true }))
+    );
+    setSemilleroNotifications(prevNotifications => 
+      prevNotifications.map(notification => ({ ...notification, read: true }))
+    );
+  };
 
   if (loading) {
     return (
@@ -80,36 +145,6 @@ export default function NotificationsPage() {
     );
   }
 
-  // Add Semillero-specific notifications
-  const semilleroNotifications = [
-    {
-      id: 'notif-semillero-1',
-      userId: 'user-1',
-      title: 'Entregas Tardías en Célula A',
-      message: '3 estudiantes de tu célula tienen entregas tardías esta semana. Revisa el progreso de Ana Martínez, Carlos López y Juan Pérez.',
-      type: 'late_delivery' as const,
-      read: false,
-      createdAt: new Date('2024-01-19T10:00:00')
-    },
-    {
-      id: 'notif-semillero-2', 
-      userId: 'user-2',
-      title: 'Célula con Bajo Rendimiento',
-      message: 'La Célula C - Data Analytics tiene un 69% de completado. Considera programar una sesión de apoyo.',
-      type: 'cell_alert' as const,
-      read: false,
-      createdAt: new Date('2024-01-18T14:30:00')
-    },
-    {
-      id: 'notif-semillero-3',
-      userId: 'user-1',
-      title: 'Nuevas Tareas por Revisar',
-      message: '5 estudiantes entregaron la tarea "SEO Optimization". Pendiente de revisión y calificación.',
-      type: 'assignment' as const,
-      read: true,
-      createdAt: new Date('2024-01-17T16:45:00')
-    }
-  ];
 
   // Enhanced notifications with user and course data
   const allNotifications = [...notifications, ...semilleroNotifications];
@@ -355,7 +390,10 @@ export default function NotificationsPage() {
                           </div>
                           <div className="flex space-x-2">
                             {!notification.read && (
-                              <button className="text-sm text-primary-600 hover:text-primary-500">
+                              <button 
+                                onClick={() => markAsRead(notification.id)}
+                                className="text-sm text-primary-600 hover:text-primary-500 transition-colors"
+                              >
                                 Marcar como leída
                               </button>
                             )}
@@ -380,7 +418,10 @@ export default function NotificationsPage() {
               Acciones Rápidas
             </h3>
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-              <button className="flex items-center justify-center px-4 py-3 border border-gray-300 rounded-md shadow-sm bg-white text-sm font-medium text-gray-700 hover:bg-gray-50">
+              <button 
+                onClick={markAllAsRead}
+                className="flex items-center justify-center px-4 py-3 border border-gray-300 rounded-md shadow-sm bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors"
+              >
                 <CheckCircle className="h-5 w-5 mr-2 text-green-500" />
                 Marcar todas como leídas
               </button>

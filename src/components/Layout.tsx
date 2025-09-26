@@ -13,11 +13,13 @@ import {
   X,
   Home,
   TrendingUp,
-  UserCheck
+  UserCheck,
+  LogOut
 } from 'lucide-react';
 import RoleSwitcher from '@/components/RoleSwitcher';
 import CompassLogo from '@/components/CompassLogo';
 import { useRole } from '@/context/role-context';
+import { signOut } from 'next-auth/react';
 
 const getNavigationForRole = (role: string) => {
   const baseNavigation = [
@@ -161,12 +163,21 @@ export default function Layout({ children }: LayoutProps) {
                 </div>
               </div>
             </div>
-            <div className="ml-4 flex items-center md:ml-6">
-              <div className="hidden sm:block mr-4">
+            <div className="ml-4 flex items-center md:ml-6 space-x-3">
+              <div className="hidden sm:block">
                 <RoleSwitcher />
               </div>
               <button type="button" className="rounded-full bg-white p-1 text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2">
                 <Bell className="h-6 w-6" />
+              </button>
+              <button 
+                type="button" 
+                onClick={() => signOut({ callbackUrl: '/auth/signin' })}
+                className="flex items-center px-3 py-2 text-sm font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50 rounded-md transition-colors"
+                title="Cerrar sesión"
+              >
+                <LogOut className="h-4 w-4 mr-2" />
+                <span className="hidden sm:inline">Salir</span>
               </button>
             </div>
           </div>
