@@ -4,19 +4,51 @@ export function cn(...inputs: ClassValue[]) {
   return clsx(inputs);
 }
 
-export function formatDate(date: Date): string {
+// Helper function to safely convert input to Date object
+function ensureDate(input: Date | string | number | null | undefined): Date {
+  // Handle null/undefined cases
+  if (input === null || input === undefined) {
+    console.warn('Null or undefined date input, using current date');
+    return new Date();
+  }
+  
+  if (input instanceof Date) {
+    // Check if it's a valid Date object
+    if (isNaN(input.getTime())) {
+      console.warn('Invalid Date object:', input);
+      return new Date();
+    }
+    return input;
+  }
+  
+  if (typeof input === 'string' || typeof input === 'number') {
+    const date = new Date(input);
+    if (isNaN(date.getTime())) {
+      console.warn('Invalid date input:', input);
+      return new Date(); // Return current date as fallback
+    }
+    return date;
+  }
+  
+  console.warn('Unexpected date input type:', typeof input, input);
+  return new Date(); // Return current date as fallback
+}
+
+export function formatDate(date: Date | string | number | null | undefined): string {
+  const dateObj = ensureDate(date);
   return new Intl.DateTimeFormat('es-ES', {
     year: 'numeric',
     month: 'long',
     day: 'numeric',
-  }).format(date);
+  }).format(dateObj);
 }
 
-export function formatShortDate(date: Date): string {
+export function formatShortDate(date: Date | string | number | null | undefined): string {
+  const dateObj = ensureDate(date);
   return new Intl.DateTimeFormat('es-ES', {
     month: 'short',
     day: 'numeric',
-  }).format(date);
+  }).format(dateObj);
 }
 
 export function getProgressColor(percentage: number): string {

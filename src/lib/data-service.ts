@@ -1,12 +1,47 @@
 import { Course, Assignment, Submission, User, StudentProgress, Notification } from '@/types';
 
+// Helper function to safely convert date strings to Date objects
+function safeParseDate(dateInput: any): Date {
+  if (!dateInput || dateInput === null || dateInput === undefined) {
+    return new Date();
+  }
+  
+  if (dateInput instanceof Date) {
+    // Check if it's a valid Date object
+    if (isNaN(dateInput.getTime())) {
+      console.warn('Invalid Date object:', dateInput);
+      return new Date();
+    }
+    return dateInput;
+  }
+  
+  try {
+    const date = new Date(dateInput);
+    if (isNaN(date.getTime())) {
+      console.warn('Invalid date input:', dateInput);
+      return new Date();
+    }
+    return date;
+  } catch (error) {
+    console.warn('Error parsing date:', dateInput, error);
+    return new Date();
+  }
+}
+
 // Client-side data fetching functions
 export async function fetchCourses(): Promise<Course[]> {
   const response = await fetch('/api/classroom/courses');
   if (!response.ok) {
     throw new Error('Failed to fetch courses');
   }
-  return response.json();
+  const data = await response.json();
+  
+  // Convert date strings back to Date objects
+  return data.map((course: any) => ({
+    ...course,
+    createdAt: safeParseDate(course.createdAt),
+    updatedAt: safeParseDate(course.updatedAt),
+  }));
 }
 
 export async function fetchCourseStudents(courseId: string): Promise<any[]> {
@@ -22,7 +57,14 @@ export async function fetchCourseWork(courseId: string): Promise<Assignment[]> {
   if (!response.ok) {
     throw new Error('Failed to fetch course work');
   }
-  return response.json();
+  const data = await response.json();
+  
+  // Convert date strings back to Date objects
+  return data.map((assignment: any) => ({
+    ...assignment,
+    dueDate: safeParseDate(assignment.dueDate),
+    createdAt: safeParseDate(assignment.createdAt),
+  }));
 }
 
 export async function fetchSubmissions(courseId: string): Promise<Submission[]> {
@@ -30,7 +72,13 @@ export async function fetchSubmissions(courseId: string): Promise<Submission[]> 
   if (!response.ok) {
     throw new Error('Failed to fetch submissions');
   }
-  return response.json();
+  const data = await response.json();
+  
+  // Convert date strings back to Date objects
+  return data.map((submission: any) => ({
+    ...submission,
+    submittedAt: submission.submittedAt ? safeParseDate(submission.submittedAt) : undefined,
+  }));
 }
 
 // Aggregate data functions
@@ -63,14 +111,25 @@ export async function fetchAllCoursesWithData(): Promise<{
     const studentMap = new Map<string, User>();
     
     courseData.forEach(({ course, students, assignments, submissions }) => {
-      // Update course with student IDs
+      // Update course with student IDs and ensure dates are Date objects
       course.students = students.map(s => s.profile?.id || s.userId);
+      course.createdAt = safeParseDate(course.createdAt);
+      course.updatedAt = safeParseDate(course.updatedAt);
       
-      // Add assignments
-      allAssignments.push(...assignments);
+      // Add assignments with proper date conversion
+      const processedAssignments = assignments.map((assignment: any) => ({
+        ...assignment,
+        dueDate: safeParseDate(assignment.dueDate),
+        createdAt: safeParseDate(assignment.createdAt),
+      }));
+      allAssignments.push(...processedAssignments);
       
-      // Add submissions
-      allSubmissions.push(...submissions);
+      // Add submissions with proper date conversion
+      const processedSubmissions = submissions.map((submission: any) => ({
+        ...submission,
+        submittedAt: submission.submittedAt ? safeParseDate(submission.submittedAt) : undefined,
+      }));
+      allSubmissions.push(...processedSubmissions);
       
       // Add unique students
       students.forEach(student => {

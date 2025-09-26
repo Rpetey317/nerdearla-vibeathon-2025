@@ -203,32 +203,88 @@ export async function getUserRoleInCourse(courseId: string, userId: string) {
 
 // Transform Google Classroom data to our internal format
 export function transformCourseToInternal(course: any) {
+  // Helper function to safely create date from timestamp
+  const safeCreateDate = (timestamp: string): Date => {
+    if (!timestamp) return new Date();
+    
+    try {
+      const date = new Date(timestamp);
+      if (isNaN(date.getTime())) {
+        console.warn('Invalid timestamp for course:', timestamp);
+        return new Date();
+      }
+      return date;
+    } catch (error) {
+      console.warn('Error creating date from timestamp:', timestamp, error);
+      return new Date();
+    }
+  };
+
   return {
     id: course.id,
     name: course.name,
     description: course.description || '',
     teacherId: course.ownerId,
     students: [], // Will be populated separately
-    createdAt: new Date(course.creationTime),
-    updatedAt: new Date(course.updateTime),
+    createdAt: safeCreateDate(course.creationTime),
+    updatedAt: safeCreateDate(course.updateTime),
     alternateLink: course.alternateLink,
     courseState: course.courseState,
   };
 }
 
 export function transformCourseWorkToAssignment(courseWork: any, courseId: string) {
+  // Helper function to safely create date from Google Classroom date object
+  const createDateFromGoogleDate = (googleDate: any): Date => {
+    if (!googleDate) return new Date();
+    
+    try {
+      // Google Classroom returns dates in format: { year: 2024, month: 1, day: 15 }
+      // Note: month is 1-based in Google's format, but Date constructor expects 0-based
+      const year = googleDate.year || new Date().getFullYear();
+      const month = (googleDate.month || 1) - 1; // Convert to 0-based
+      const day = googleDate.day || 1;
+      
+      const date = new Date(year, month, day);
+      
+      // Validate the created date
+      if (isNaN(date.getTime())) {
+        console.warn('Invalid date created from Google date object:', googleDate);
+        return new Date();
+      }
+      
+      return date;
+    } catch (error) {
+      console.warn('Error creating date from Google date object:', googleDate, error);
+      return new Date();
+    }
+  };
+
+  // Helper function to safely create date from timestamp string
+  const createDateFromTimestamp = (timestamp: string): Date => {
+    if (!timestamp) return new Date();
+    
+    try {
+      const date = new Date(timestamp);
+      if (isNaN(date.getTime())) {
+        console.warn('Invalid timestamp:', timestamp);
+        return new Date();
+      }
+      return date;
+    } catch (error) {
+      console.warn('Error creating date from timestamp:', timestamp, error);
+      return new Date();
+    }
+  };
+
   return {
     id: courseWork.id,
     courseId,
     title: courseWork.title,
     description: courseWork.description || '',
-    dueDate: courseWork.dueDate ? new Date(
-      courseWork.dueDate.year,
-      courseWork.dueDate.month - 1,
-      courseWork.dueDate.day
-    ) : new Date(),
+    dueDate: createDateFromGoogleDate(courseWork.dueDate),
     maxPoints: courseWork.maxPoints || 100,
-    createdAt: new Date(courseWork.creationTime),
+    createdAt: createDateFromTimestamp(courseWork.creationTime),
     alternateLink: courseWork.alternateLink,
     workType: courseWork.workType,
   };
@@ -244,11 +300,28 @@ export function transformSubmissionToInternal(submission: any) {
     }
   };
 
+  // Helper function to safely create date from timestamp
+  const safeCreateDate = (timestamp: string): Date | undefined => {
+    if (!timestamp) return undefined;
+    
+    try {
+      const date = new Date(timestamp);
+      if (isNaN(date.getTime())) {
+        console.warn('Invalid timestamp for submission:', timestamp);
+        return undefined;
+      }
+      return date;
+    } catch (error) {
+      console.warn('Error creating date from timestamp:', timestamp, error);
+      return undefined;
+    }
+  };
+
   return {
     id: submission.id,
     assignmentId: submission.courseWorkId,
     studentId: submission.userId,
-    submittedAt: submission.updateTime ? new Date(submission.updateTime) : undefined,
+    submittedAt: safeCreateDate(submission.updateTime),
     grade: submission.assignedGrade,
     status: getSubmissionState(submission.state),
     feedback: submission.draftGrade ? 'Graded' : undefined,
